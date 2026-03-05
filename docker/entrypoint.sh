@@ -4,7 +4,7 @@ set -e
 echo "Starting Laravel container..."
 
 echo "Creating .env file..."
-cat > /var/www/html/.env << EOL
+cat > /var/www/html/.env << EOF
 APP_NAME=${APP_NAME:-Laravel}
 APP_ENV=${APP_ENV:-production}
 APP_KEY=${APP_KEY}
@@ -24,9 +24,10 @@ DB_PASSWORD=${DB_PASSWORD}
 CACHE_DRIVER=file
 SESSION_DRIVER=file
 QUEUE_CONNECTION=sync
-EOL
+EOF
 
 echo ".env created!"
+echo "DB_HOST=${DB_HOST}, DB_DATABASE=${DB_DATABASE}, DB_USERNAME=${DB_USERNAME}"
 
 if [ -z "$APP_KEY" ]; then
     echo "Generating application key..."
@@ -34,7 +35,7 @@ if [ -z "$APP_KEY" ]; then
 fi
 
 echo "Waiting for MySQL..."
-until php -r "new PDO('mysql:host=${DB_HOST};port=${DB_PORT};dbname=${DB_DATABASE}', '${DB_USERNAME}', '${DB_PASSWORD}');" 2>/dev/null; do
+until php -r "new PDO('mysql:host=${DB_HOST:-mysql_db};port=${DB_PORT:-3306};dbname=${DB_DATABASE}', '${DB_USERNAME}', '${DB_PASSWORD}');" 2>/dev/null; do
     sleep 2
     echo "MySQL not ready yet, retrying..."
 done
