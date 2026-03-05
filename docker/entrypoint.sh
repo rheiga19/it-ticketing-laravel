@@ -1,7 +1,31 @@
-#!/bin/bash
 set -e
 
 echo "Starting Laravel container..."
+
+echo "Creating .env file..."
+cat > /var/www/html/.env << EOL
+APP_NAME=${APP_NAME:-Laravel}
+APP_ENV=${APP_ENV:-production}
+APP_KEY=${APP_KEY}
+APP_DEBUG=${APP_DEBUG:-false}
+APP_URL=${APP_URL:-http://localhost}
+
+LOG_CHANNEL=stderr
+LOG_LEVEL=error
+
+DB_CONNECTION=mysql
+DB_HOST=${DB_HOST:-mysql_db}
+DB_PORT=${DB_PORT:-3306}
+DB_DATABASE=${DB_DATABASE}
+DB_USERNAME=${DB_USERNAME}
+DB_PASSWORD=${DB_PASSWORD}
+
+CACHE_DRIVER=file
+SESSION_DRIVER=file
+QUEUE_CONNECTION=sync
+EOL
+
+echo ".env created!"
 
 # Generate app key if not set
 if [ -z "$APP_KEY" ]; then
@@ -17,7 +41,7 @@ until php -r "new PDO('mysql:host=${DB_HOST};port=${DB_PORT};dbname=${DB_DATABAS
 done
 echo "MySQL is ready!"
 
-# Run migrations (skip if already up to date)
+# Run migrations
 echo "Running migrations..."
 php artisan migrate --force --no-interaction
 
