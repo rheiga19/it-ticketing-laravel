@@ -26,7 +26,7 @@ WORKDIR /var/www/html
 
 # Copy composer files first (layer caching)
 COPY composer.json composer.lock ./
-RUN composer install --no-scripts --no-autoloader --no-dev --ignore-platform-reqs
+RUN composer install --no-scripts --no-autoloader --ignore-platform-reqs
 
 # Copy package.json for npm
 COPY package.json package-lock.json ./
