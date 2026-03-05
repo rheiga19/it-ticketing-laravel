@@ -11,9 +11,6 @@ env:
   CONTAINER_NAME: laravel_app
 
 jobs:
-  # ─────────────────────────────────────────
-  # JOB 1: BUILD DOCKER IMAGE
-  # ─────────────────────────────────────────
   build:
     name: Build Laravel + Tailwind
     runs-on: ubuntu-latest
@@ -37,9 +34,6 @@ jobs:
           path: image.tar.gz
           retention-days: 1
 
-  # ─────────────────────────────────────────
-  # JOB 2: DEPLOY KE SERVER
-  # ─────────────────────────────────────────
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
@@ -69,7 +63,7 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa \
             -o StrictHostKeyChecking=no \
-            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'DEPLOY'
 
             echo "Loading Docker image..."
             docker load < /tmp/laravel-image.tar.gz
@@ -87,14 +81,14 @@ jobs:
               -e APP_NAME="Laravel" \
               -e APP_ENV=production \
               -e APP_DEBUG=false \
-              -e APP_URL=${{ secrets.APP_URL }} \
+              -e APP_URL=http://159.65.141.48:8083 \
               -e APP_KEY=${{ secrets.APP_KEY }} \
               -e DB_CONNECTION=mysql \
               -e DB_HOST=mysql_db \
               -e DB_PORT=3306 \
-              -e DB_DATABASE=${{ secrets.DB_DATABASE }} \
-              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e DB_DATABASE=tiketing \
+              -e DB_USERNAME=root \
+              -e DB_PASSWORD=root123 \
               laravel-app:latest
 
             echo "Cleaning up..."
@@ -104,7 +98,7 @@ jobs:
             echo "Deploy selesai!"
             docker ps | grep laravel_app
 
-          EOF
+          DEPLOY
 
       - name: Verifikasi deployment
         run: |
